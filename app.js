@@ -65,7 +65,7 @@ function renderGrid(list = currentVideos) {
             <img src="${v.thumbnailUrl}">
             <div class="info">
                 <b>${v.title}</b><br>
-                ${v.duration} • ${v.views} views
+                <small>${v.duration} • ${v.views} views</small>
             </div>
         `;
         d.onclick = () => location = `watch.html?id=${v.id}`;
