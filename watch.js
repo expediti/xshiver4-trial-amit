@@ -17,21 +17,23 @@ async function initWatch() {
         let foundVideo = null;
         let allVideos = [];
 
-        // Fetch ALL files to find the video ID
-        for (const url of DATA_FILES) {
-            try {
-                const res = await fetch(url);
-                if(res.ok) {
-                    const data = await res.json();
-                    allVideos = [...allVideos, ...data]; // Collect for suggestions
-                    
-                    const match = data.find(v => v.id === id);
-                    if (match) foundVideo = match;
-                }
-            } catch (err) {
-                console.warn("Skipping file:", url);
-            }
-        }
+        // Fetch ALL files to ensure we find the ID and have suggestions
+        const promises = DATA_FILES.map(url => 
+            fetch(url)
+                .then(res => res.json())
+                .catch(err => {
+                    console.warn("Failed to load:", url);
+                    return []; // Continue even if one fails
+                })
+        );
+
+        const results = await Promise.all(promises);
+        
+        // Merge all data
+        allVideos = results.flat();
+        
+        // Find the video
+        foundVideo = allVideos.find(v => v.id === id);
 
         if (foundVideo) {
             // Setup Player
@@ -57,11 +59,11 @@ async function initWatch() {
 
             renderRelated(foundVideo, allVideos);
         } else {
-            document.getElementById("title").innerText = "Video ID not found in any database file.";
+            document.getElementById("title").innerText = "Video unavailable or deleted.";
         }
     } catch (e) {
         console.error(e);
-        document.getElementById("title").innerText = "Error loading video data.";
+        document.getElementById("title").innerText = "Error loading video.";
     }
 }
 
@@ -78,7 +80,7 @@ function renderRelated(current, all) {
         .slice(0, 10);
 
     suggestions.forEach(v => {
-        // Random Views (matches your request)
+        // Random Views
         const randomViews = Math.floor(Math.random() * 900 + 100) + 'k';
 
         const d = document.createElement("div");
