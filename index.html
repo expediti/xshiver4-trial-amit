@@ -7,57 +7,42 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <header>
-        <h1>XSHIVER</h1>
-        <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Search videos...">
+        <div class="header-top">
+            <a href="index.html" class="logo">XSHIVER</a>
+            
+            <a href="pro.html" class="btn-pro">
+                GET PRO ₹99
+                <span>150+ Videos Bundle</span>
+            </a>
         </div>
-        <a href="pro.html" class="get-pro">Get Pro</a>
-        <nav class="categories" id="categoryTabs">
-            <!-- Categories will be dynamically loaded here -->
-        </nav>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search videos...">
+        </div>
+
+        <nav class="category-scroll" id="categoryTabs">
+            </nav>
     </header>
 
     <main>
         <div class="video-grid" id="videoGrid">
-            <!-- Videos will be dynamically loaded here -->
-        </div>
+            </div>
 
         <div class="pagination">
-            <button id="prev">Previous</button>
-            <span id="pageInfo"></span>
+            <button id="prev">Prev</button>
+            <span id="pageInfo">1 / 10</span>
             <button id="next">Next</button>
         </div>
     </main>
 
     <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Company</h3>
-                <a href="#">About Us</a>
-                <a href="#">Contact</a>
-            </div>
-            <div class="footer-section">
-                <h3>Support</h3>
-                <a href="#">Video Removal</a>
-                <a href="#">DMCA</a>
-            </div>
-            <div class="footer-section">
-                <h3>Legal</h3>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-            </div>
-            <div class="footer-section">
-                <h3>Follow Us</h3>
-                <div class="social-icons">
-                    <a href="https://instagram.com/yourusername" target="_blank" aria-label="Instagram">📷</a>
-                    <a href="https://t.me/yourusername" target="_blank" aria-label="Telegram">📧</a>
-                </div>
-            </div>
+        <div class="social-links">
+            <a href="#">Instagram</a>
+            <a href="#">Telegram</a>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 XSHIVER. All rights reserved.</p>
-        </div>
+        <p style="margin-top:10px; opacity:0.5;">&copy; 2026 XSHIVER</p>
     </footer>
 
     <script src="app.js"></script>
