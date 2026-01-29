@@ -1,55 +1,58 @@
-// Configuration
-const JSON_PATH = "videos.json"; 
+// --- CONFIGURATION ---
+const SOURCES = {
+    "Instagram Viral": "data/fuckmaza.json",
+    "Indian Leaked": "data/bhojpuri.json",
+    "Telegram Viral": "data/lol49.json"
+};
+
 const PER_PAGE = 16;
 
-let allVideos = [];
+// --- STATE ---
+let cache = {}; // Stores loaded JSON data to prevent re-fetching
+let currentCategory = "Instagram Viral"; // Default start category
+let currentVideos = [];
 let currentPage = 1;
-let currentCategory = "All";
 
-// ---------- INIT ----------
-async function initApp() {
+// ---------- LOAD CATEGORY ----------
+async function loadCategory(name) {
+    currentCategory = name;
+    currentPage = 1;
+    const url = SOURCES[name];
+
+    // Show loading state
+    const grid = document.getElementById("videoGrid");
+    if(grid) grid.innerHTML = `<p style="color:white; text-align:center; padding:20px;">Loading ${name}...</p>`;
+
     try {
-        const res = await fetch(JSON_PATH);
-        if (!res.ok) throw new Error("Could not load videos.json");
+        // Fetch if not in cache
+        if (!cache[name]) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`Failed to load ${url}`);
+            cache[name] = await res.json();
+        }
+
+        // Apply Data
+        currentVideos = cache[name];
         
-        allVideos = await res.json();
-        
-        initHeader();
-        initSearch();
+        // Update UI
+        updateCategoryUI();
         renderGrid();
+
     } catch (e) {
-        console.error("Error:", e);
-        document.getElementById("videoGrid").innerHTML = 
-            `<p style="color:white; text-align:center; padding:20px;">
-                Error loading videos. Please ensure <b>videos.json</b> is in the main folder.
-            </p>`;
+        console.error(e);
+        if(grid) grid.innerHTML = `<p style="color:red; text-align:center;">Error loading data. Check if <b>${url}</b> exists.</p>`;
     }
 }
 
-// ---------- HEADER CATEGORIES ----------
-function initHeader() {
-    const nav = document.getElementById("categoryTabs");
-    if (!nav) return;
-    nav.innerHTML = "";
-
-    const categories = ["All", "Instagram Viral", "Indian Leaked", "Telegram Viral"];
-
-    categories.forEach(name => {
-        const b = document.createElement("button");
-        b.className = "cat-btn";
-        if (name === "All") b.classList.add("active");
-        b.innerText = name;
-        
-        b.onclick = () => {
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+// ---------- CATEGORY BUTTONS UI ----------
+function updateCategoryUI() {
+    const buttons = document.querySelectorAll('.cat-btn');
+    buttons.forEach(b => {
+        if (b.innerText === currentCategory) {
             b.classList.add('active');
-            
-            currentCategory = name;
-            currentPage = 1;
-            renderGrid();
-        };
-        
-        nav.appendChild(b);
+        } else {
+            b.classList.remove('active');
+        }
     });
 }
 
@@ -62,27 +65,21 @@ function renderGrid(customList = null) {
 
     if (!grid) return;
 
-    let list = customList || allVideos;
-    
-    if (!customList && currentCategory !== "All") {
-        const keyword = currentCategory.split(" ")[0].toLowerCase(); 
-        list = allVideos.filter(v => 
-            v.title.toLowerCase().includes(keyword) || 
-            (v.tags && v.tags.some(t => t.toLowerCase().includes(keyword)))
-        );
-    }
+    let list = customList || currentVideos;
 
+    // Pagination
     const totalPages = Math.ceil(list.length / PER_PAGE) || 1;
     if (currentPage > totalPages) currentPage = 1;
-    
+    if (currentPage < 1) currentPage = 1;
+
     const start = (currentPage - 1) * PER_PAGE;
     const end = start + PER_PAGE;
     const pageVideos = list.slice(start, end);
 
     grid.innerHTML = "";
-    
+
     pageVideos.forEach(v => {
-        // GENERATE RANDOM VIEW COUNT (e.g., 233k, 150k)
+        // Random Views Logic (as requested)
         const randomViews = Math.floor(Math.random() * 900 + 100) + 'k';
 
         const d = document.createElement("div");
@@ -92,7 +89,7 @@ function renderGrid(customList = null) {
                 <img 
                     src="${v.thumbnailUrl}" 
                     class="card-thumb" 
-                    loading="lazy" 
+                    loading="lazy"
                     onerror="this.onerror=null; this.src='https://placehold.co/600x400/151525/FFF?text=No+Preview';"
                 >
                 <span class="duration-badge">${v.duration || '00:00'}</span>
@@ -104,10 +101,12 @@ function renderGrid(customList = null) {
                 </div>
             </div>
         `;
+        // Navigate to watch page
         d.onclick = () => window.location.href = `watch.html?id=${v.id}`;
         grid.appendChild(d);
     });
 
+    // Update Controls
     if (pageInfo) pageInfo.innerText = `${currentPage} / ${totalPages}`;
     
     if (prev) {
@@ -120,6 +119,21 @@ function renderGrid(customList = null) {
     }
 }
 
+// ---------- INIT HEADER BUTTONS ----------
+function initHeader() {
+    const nav = document.getElementById("categoryTabs");
+    if (!nav) return;
+    nav.innerHTML = "";
+
+    Object.keys(SOURCES).forEach(name => {
+        const b = document.createElement("button");
+        b.className = "cat-btn";
+        b.innerText = name;
+        b.onclick = () => loadCategory(name);
+        nav.appendChild(b);
+    });
+}
+
 // ---------- SEARCH ----------
 function initSearch() {
     const s = document.getElementById("searchInput");
@@ -127,14 +141,22 @@ function initSearch() {
 
     s.oninput = (e) => {
         const q = e.target.value.toLowerCase();
+        
+        // Search inside the CURRENT category array
         if (!q) {
             renderGrid();
             return;
         }
-        const results = allVideos.filter(v => v.title.toLowerCase().includes(q));
-        currentPage = 1;
+        
+        const results = currentVideos.filter(v => v.title.toLowerCase().includes(q));
+        currentPage = 1; // Reset page on search
         renderGrid(results);
     };
 }
 
-document.addEventListener("DOMContentLoaded", initApp);
+// ---------- APP START ----------
+document.addEventListener("DOMContentLoaded", () => {
+    initHeader();
+    initSearch();
+    loadCategory(currentCategory); // Load default category
+});
