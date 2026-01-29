@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Allow Google to crawl JavaScript & JSON
+Allow: /app.js
+Allow: /videos.json
+Allow: /style.css
+
+# Block useless files
+Disallow: /pro.html
+Disallow: /404.html
+
+# Video sitemap
+Sitemap: https://YOURDOMAIN.com/sitemap.xml
