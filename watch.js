@@ -1,5 +1,11 @@
 const id = new URLSearchParams(location.search).get("id");
-const JSON_PATH = "videos.json";
+
+// List of all data files to check
+const DATA_FILES = [
+    "data/fuckmaza.json",
+    "data/bhojpuri.json",
+    "data/lol49.json"
+];
 
 async function initWatch() {
     if (!id) {
@@ -8,19 +14,36 @@ async function initWatch() {
     }
 
     try {
-        const res = await fetch(JSON_PATH);
-        const allVideos = await res.json();
-        
-        const foundVideo = allVideos.find(v => v.id === id);
+        let foundVideo = null;
+        let allVideos = [];
+
+        // Fetch ALL files to find the video ID
+        for (const url of DATA_FILES) {
+            try {
+                const res = await fetch(url);
+                if(res.ok) {
+                    const data = await res.json();
+                    allVideos = [...allVideos, ...data]; // Collect for suggestions
+                    
+                    const match = data.find(v => v.id === id);
+                    if (match) foundVideo = match;
+                }
+            } catch (err) {
+                console.warn("Skipping file:", url);
+            }
+        }
 
         if (foundVideo) {
+            // Setup Player
             const player = document.getElementById("player");
             player.src = foundVideo.embedUrl;
             player.poster = foundVideo.thumbnailUrl;
 
+            // Setup Info
             document.getElementById("title").innerText = foundVideo.title;
             document.getElementById("description").innerText = foundVideo.description || "";
 
+            // Setup Tags
             const tagBox = document.getElementById("tags");
             tagBox.innerHTML = "";
             if (foundVideo.tags) {
@@ -34,7 +57,7 @@ async function initWatch() {
 
             renderRelated(foundVideo, allVideos);
         } else {
-            document.getElementById("title").innerText = "Video ID not found in database.";
+            document.getElementById("title").innerText = "Video ID not found in any database file.";
         }
     } catch (e) {
         console.error(e);
@@ -46,13 +69,16 @@ function renderRelated(current, all) {
     const list = document.getElementById("related");
     list.innerHTML = "";
 
+    // 1. Filter out current video
+    // 2. Shuffle
+    // 3. Take 10
     const suggestions = all
         .filter(v => v.id !== current.id)
         .sort(() => 0.5 - Math.random())
         .slice(0, 10);
 
     suggestions.forEach(v => {
-        // GENERATE RANDOM VIEW COUNT
+        // Random Views (matches your request)
         const randomViews = Math.floor(Math.random() * 900 + 100) + 'k';
 
         const d = document.createElement("div");
