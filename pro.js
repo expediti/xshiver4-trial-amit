@@ -28,9 +28,21 @@ const proVideos = [
     // --- ITEM 4 (Copy this block to add more!) ---
     {
         image: "pro4.jpg",
-        title: "coming soon....",
-        link: "PASTE_DISK_WALA_LINK_HERE"
+        title: "Payal Gaming full Leaked",
+        link: "https://www.diskwala.com/app/697e1a2139857e10c6080805"
+    },
+     {
+        image: "pro5.jpg",
+        title: "premium couple leaked full",
+        link: "https://www.diskwala.com/app/697e0c2039857e10c6079ae2"
+    },
+     {
+        image: "pro6.jpg",
+        title: "Big boobs sleeping full sex",
+        link: "https://www.diskwala.com/app/697de1cd39857e10c6067ce6"
     }
+
+
 
 ];
 
