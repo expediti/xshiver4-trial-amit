@@ -21,12 +21,11 @@ async function loadDataForCategory(category) {
     try {
         let videosToShow = [];
 
-        // CASE 1: "All" - Fetch EVERYTHING from all 3 files
         if (category === "All") {
             const promises = Object.values(SOURCES).map(async (url) => {
                 try {
                     const res = await fetch(url);
-                    if (!res.ok) return []; // Skip broken files
+                    if (!res.ok) return []; 
                     return await res.json();
                 } catch (err) {
                     console.error(`Skipping ${url}:`, err);
@@ -35,10 +34,8 @@ async function loadDataForCategory(category) {
             });
 
             const results = await Promise.all(promises);
-            // Merge all files into one big list
             videosToShow = results.flat();
         
-        // CASE 2: Specific Category - Fetch ONE file
         } else {
             const url = SOURCES[category];
             if (!cache[url]) {
@@ -49,10 +46,8 @@ async function loadDataForCategory(category) {
             videosToShow = cache[url];
         }
 
-        // --- SHUFFLE LOGIC (The Rotation) ---
         videosToShow = videosToShow.sort(() => Math.random() - 0.5);
 
-        // CHECK IF EMPTY
         if (!videosToShow || videosToShow.length === 0) {
             grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ff4444;">No videos found.</div>`;
             return;
@@ -68,7 +63,7 @@ async function loadDataForCategory(category) {
     }
 }
 
-// ---------- CATEGORY BUTTONS UI ----------
+// ---------- UI HELPERS ----------
 function updateCategoryUI(selectedName) {
     const buttons = document.querySelectorAll('.cat-btn');
     buttons.forEach(b => {
@@ -80,7 +75,6 @@ function updateCategoryUI(selectedName) {
     });
 }
 
-// ---------- RENDER GRID ----------
 function renderGrid(customList = null) {
     const grid = document.getElementById("videoGrid");
     const pageInfo = document.getElementById("pageInfo");
@@ -91,7 +85,6 @@ function renderGrid(customList = null) {
 
     let list = customList || currentVideos;
 
-    // Pagination
     const totalPages = Math.ceil(list.length / PER_PAGE) || 1;
     if (currentPage > totalPages) currentPage = 1;
     if (currentPage < 1) currentPage = 1;
@@ -103,9 +96,7 @@ function renderGrid(customList = null) {
     grid.innerHTML = "";
 
     pageVideos.forEach(v => {
-        // Random Views
         const randomViews = Math.floor(Math.random() * 900 + 100) + 'k';
-
         const d = document.createElement("div");
         d.className = "card";
         d.innerHTML = `
@@ -129,7 +120,6 @@ function renderGrid(customList = null) {
         grid.appendChild(d);
     });
 
-    // Update Controls
     if (pageInfo) pageInfo.innerText = `${currentPage} / ${totalPages}`;
     
     if (prev) {
@@ -142,13 +132,11 @@ function renderGrid(customList = null) {
     }
 }
 
-// ---------- INIT HEADER ----------
 function initHeader() {
     const nav = document.getElementById("categoryTabs");
     if (!nav) return;
     nav.innerHTML = "";
 
-    // "All" Button
     const allBtn = document.createElement("button");
     allBtn.className = "cat-btn active";
     allBtn.innerText = "All";
@@ -159,7 +147,6 @@ function initHeader() {
     };
     nav.appendChild(allBtn);
 
-    // Other Buttons
     Object.keys(SOURCES).forEach(name => {
         const b = document.createElement("button");
         b.className = "cat-btn";
@@ -173,7 +160,6 @@ function initHeader() {
     });
 }
 
-// ---------- SEARCH ----------
 function initSearch() {
     const s = document.getElementById("searchInput");
     if (!s) return;
@@ -190,45 +176,41 @@ function initSearch() {
     };
 }
 
-// ---------- GATEKEEPER & START ----------
+// ---------- VERIFICATION LOGIC (FIXED) ----------
 
-// 1. Function to Verify User
 function verifyUser() {
     const user = document.getElementById("entryUser").value.trim();
-    const email = document.getElementById("entryEmail").value.trim();
+    // FIX: Look for "entryAge" instead of Email
+    const ageInput = document.getElementById("entryAge");
     const error = document.getElementById("entryError");
 
-    // Simple validation
-    if (user.length < 3 || !email.includes("@")) {
+    const age = ageInput ? ageInput.value.trim() : "";
+
+    // Validation: Check Username and Age >= 18
+    if (user.length < 1 || !age || parseInt(age) < 18) {
         error.style.display = "block";
-        error.innerText = "Please enter a valid username and email.";
+        error.innerText = "You must verify your age (18+) to enter.";
         return;
     }
 
-    // Save to LocalStorage (So they don't see it again)
-    localStorage.setItem("xshiver_user", JSON.stringify({ user, email }));
-
-    // Hide Popup & Start Site
+    // Save & Unlock
+    localStorage.setItem("xshiver_user", JSON.stringify({ user, age }));
     document.getElementById("entryPopup").style.display = "none";
     startSite();
 }
 
-// 2. Logic to Start the Site
 function startSite() {
     initHeader();
     initSearch();
     loadDataForCategory("All");
 }
 
-// 3. Main Entry Point
 document.addEventListener("DOMContentLoaded", () => {
     const savedUser = localStorage.getItem("xshiver_user");
 
     if (savedUser) {
-        // User already verified -> Load Immediately
         startSite();
     } else {
-        // User NOT verified -> Show Popup
         const popup = document.getElementById("entryPopup");
         if(popup) popup.style.display = "flex";
     }
