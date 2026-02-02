@@ -17,15 +17,21 @@
     <link rel="stylesheet" href="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.css" type="text/css"/>
 
     <link rel="stylesheet" href="style.css">
-    
+
     <style>
-        /* Ensure 2 columns on mobile for suggestions */
-        @media (max-width: 768px) {
-            .video-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr; /* Force 2 columns */
-                gap: 10px;
-            }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr) !important; 
+            gap: 10px;
+        }
+        @media (min-width: 768px) {
+            .video-grid { grid-template-columns: repeat(4, 1fr) !important; }
+        }
+        /* Fix Player Height for Mobile */
+        .video-wrapper {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
         }
     </style>
 </head>
