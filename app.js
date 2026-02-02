@@ -50,7 +50,6 @@ async function loadDataForCategory(category) {
         }
 
         // --- SHUFFLE LOGIC (The Rotation) ---
-        // This makes them random every time you load
         videosToShow = videosToShow.sort(() => Math.random() - 0.5);
 
         // CHECK IF EMPTY
@@ -191,9 +190,46 @@ function initSearch() {
     };
 }
 
-// ---------- START ----------
-document.addEventListener("DOMContentLoaded", () => {
+// ---------- GATEKEEPER & START ----------
+
+// 1. Function to Verify User
+function verifyUser() {
+    const user = document.getElementById("entryUser").value.trim();
+    const email = document.getElementById("entryEmail").value.trim();
+    const error = document.getElementById("entryError");
+
+    // Simple validation
+    if (user.length < 3 || !email.includes("@")) {
+        error.style.display = "block";
+        error.innerText = "Please enter a valid username and email.";
+        return;
+    }
+
+    // Save to LocalStorage (So they don't see it again)
+    localStorage.setItem("xshiver_user", JSON.stringify({ user, email }));
+
+    // Hide Popup & Start Site
+    document.getElementById("entryPopup").style.display = "none";
+    startSite();
+}
+
+// 2. Logic to Start the Site
+function startSite() {
     initHeader();
     initSearch();
     loadDataForCategory("All");
+}
+
+// 3. Main Entry Point
+document.addEventListener("DOMContentLoaded", () => {
+    const savedUser = localStorage.getItem("xshiver_user");
+
+    if (savedUser) {
+        // User already verified -> Load Immediately
+        startSite();
+    } else {
+        // User NOT verified -> Show Popup
+        const popup = document.getElementById("entryPopup");
+        if(popup) popup.style.display = "flex";
+    }
 });
