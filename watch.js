@@ -5,10 +5,9 @@ const params = new URLSearchParams(window.location.search);
 const currentId = params.get("id");
 
 async function initWatch() {
-    // Basic checks
     if (!currentId) { window.location.href = "index.html"; return; }
     
-    // Set Canonical URL for SEO
+    // SEO Canonical
     let link = document.querySelector("link[rel='canonical']");
     if (!link) {
         link = document.createElement("link");
@@ -18,26 +17,18 @@ async function initWatch() {
     link.href = window.location.origin + "/watch.html?id=" + currentId;
 
     try {
+        // 1. FETCH THE SINGLE DATA FILE
         const res = await fetch(VIDEO_FILE);
+        if (!res.ok) throw new Error("Could not load data.json");
+        
         const allVideos = await res.json();
 
-        // 1. FIND CURRENT VIDEO
+        // 2. FIND VIDEO
         const video = allVideos.find(v => v.id === currentId);
 
         if (video) {
-            // -------- SEO & UI ----------
+            // UI & SEO
             document.title = video.title + " - XSHIVER";
-            
-            // Meta Description
-            let descTag = document.querySelector('meta[name="description"]');
-            if (!descTag) {
-                descTag = document.createElement('meta');
-                descTag.name = "description";
-                document.head.appendChild(descTag);
-            }
-            descTag.content = `${video.title} on XSHIVER. Watch HD streaming online.`;
-
-            // UI Updates
             document.getElementById("title").innerText = video.title;
             document.getElementById("description").innerText = video.description || `Watch ${video.title} on XSHIVER.`;
 
@@ -53,19 +44,18 @@ async function initWatch() {
                 });
             }
 
-            // -------- FLUID PLAYER SETUP (WITH AD) ----------
+            // 3. FLUID PLAYER SETUP
             const playerVideoTag = document.getElementById("mainPlayer");
             
-            // 1. Set source attributes directly
+            // Inject Source
             playerVideoTag.innerHTML = `<source src="${video.embedUrl}" type="video/mp4" />`;
             
-            // 2. Initialize Fluid Player
-            // We verify the element exists first to avoid errors
+            // Initialize Player
             if (playerVideoTag) {
                 fluidPlayer("mainPlayer", {
                     layoutControls: {
                         fillToContainer: true,
-                        posterImage: video.thumbnailUrl || '', // Video Thumbnail
+                        posterImage: video.thumbnailUrl || '', 
                         autoPlay: false, 
                         playButtonShowing: true,
                         playPauseAnimation: true,
@@ -79,8 +69,8 @@ async function initWatch() {
                     vastOptions: {
                         adList: [
                             {
-                                roll: 'preRoll', // Play Ad before video
-                                vastTag: 'https://s.magsrv.com/v1/vast.php?idzone=5843716' // YOUR AD TAG
+                                roll: 'preRoll', 
+                                vastTag: 'https://s.magsrv.com/v1/vast.php?idzone=5843716' // Your Ad Tag
                             }
                         ]
                     }
@@ -91,7 +81,7 @@ async function initWatch() {
             document.getElementById("title").innerText = "Video not found.";
         }
 
-        // 2. LOAD SUGGESTIONS
+        // 4. LOAD SUGGESTIONS
         const suggestions = allVideos
             .filter(v => v.id !== currentId)
             .sort(() => 0.5 - Math.random())
@@ -101,14 +91,13 @@ async function initWatch() {
 
     } catch (e) {
         console.error("Error loading video:", e);
+        document.getElementById("title").innerText = "Error loading video file.";
     }
 }
 
-// ---------------- SUGGESTIONS ----------------
 function renderSuggestions(list) {
     const grid = document.getElementById("related");
     if (!grid) return;
-    
     grid.innerHTML = "";
 
     list.forEach(item => {
