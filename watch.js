@@ -1,38 +1,32 @@
 const VIDEO_FILE = "data.json";
 
-// Get Video ID from URL
-const params = new URLSearchParams(window.location.search);
-const currentId = params.get("id");
-
 async function initWatch() {
-    if (!currentId) { window.location.href = "index.html"; return; }
-    
-    // SEO Canonical
-    let link = document.querySelector("link[rel='canonical']");
-    if (!link) {
-        link = document.createElement("link");
-        link.rel = "canonical";
-        document.head.appendChild(link);
+    // 1. Get ID from URL
+    const params = new URLSearchParams(window.location.search);
+    const currentId = params.get("id");
+
+    if (!currentId) {
+        window.location.href = "index.html";
+        return;
     }
-    link.href = window.location.origin + "/watch.html?id=" + currentId;
 
     try {
-        // 1. FETCH THE SINGLE DATA FILE
+        // 2. Fetch Data
         const res = await fetch(VIDEO_FILE);
-        if (!res.ok) throw new Error("Could not load data.json");
+        if (!res.ok) throw new Error("Failed to load video file");
         
         const allVideos = await res.json();
-
-        // 2. FIND VIDEO
+        
+        // 3. Find specific video
         const video = allVideos.find(v => v.id === currentId);
 
         if (video) {
-            // UI & SEO
+            // Update UI
             document.title = video.title + " - XSHIVER";
             document.getElementById("title").innerText = video.title;
             document.getElementById("description").innerText = video.description || `Watch ${video.title} on XSHIVER.`;
 
-            // Tags
+            // Update Tags
             const tagBox = document.getElementById("tags");
             tagBox.innerHTML = "";
             if (video.tags) {
@@ -44,44 +38,20 @@ async function initWatch() {
                 });
             }
 
-            // 3. FLUID PLAYER SETUP
-            const playerVideoTag = document.getElementById("mainPlayer");
-            
-            // Inject Source
-            playerVideoTag.innerHTML = `<source src="${video.embedUrl}" type="video/mp4" />`;
-            
-            // Initialize Player
-            if (playerVideoTag) {
-                fluidPlayer("mainPlayer", {
-                    layoutControls: {
-                        fillToContainer: true,
-                        posterImage: video.thumbnailUrl || '', 
-                        autoPlay: false, 
-                        playButtonShowing: true,
-                        playPauseAnimation: true,
-                        logo: {
-                            imageUrl: 'logo.svg', 
-                            position: 'top right',
-                            clickUrl: 'index.html',
-                            opacity: 0.8
-                        }
-                    },
-                    vastOptions: {
-                        adList: [
-                            {
-                                roll: 'preRoll', 
-                                vastTag: 'https://s.magsrv.com/v1/vast.php?idzone=5843716' // Your Ad Tag
-                            }
-                        ]
-                    }
-                });
+            // Setup Standard Player
+            const player = document.getElementById("player");
+            if (player) {
+                player.src = video.embedUrl;
+                player.poster = video.thumbnailUrl;
+                player.load(); // Forces reload of source
+                // player.play().catch(() => {}); // Optional: Auto-play
             }
 
         } else {
             document.getElementById("title").innerText = "Video not found.";
         }
 
-        // 4. LOAD SUGGESTIONS
+        // 4. Load Suggestions
         const suggestions = allVideos
             .filter(v => v.id !== currentId)
             .sort(() => 0.5 - Math.random())
@@ -90,14 +60,15 @@ async function initWatch() {
         renderSuggestions(suggestions);
 
     } catch (e) {
-        console.error("Error loading video:", e);
-        document.getElementById("title").innerText = "Error loading video file.";
+        console.error("Error:", e);
+        document.getElementById("title").innerText = "Error loading content.";
     }
 }
 
 function renderSuggestions(list) {
     const grid = document.getElementById("related");
     if (!grid) return;
+    
     grid.innerHTML = "";
 
     list.forEach(item => {
