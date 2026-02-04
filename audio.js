@@ -8,31 +8,15 @@ const audioStories = [
         // path: foldername/filename
         src: "audio1/audio1.mp3", 
         image: "audio1/audio1.jpg", 
-        duration: "12:40"
+        duration: "1:40"
     },
     {
         id: "2",
-        title: "The Office Scandal",
-        desc: "What actually happened in the boss's cabin.",
-        src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3", // Placeholder until you upload audio2
-        image: "https://placehold.co/400x400/151525/FFF?text=Audio+2",
+        title: "More Coming Soon",
+        desc: "Coming Soon",
+        src: "audio ka link ya path upar wale me se", // Placeholder until you upload audio2
+        image: "same image ka bhi",
         duration: "08:15"
-    },
-    {
-        id: "3",
-        title: "College Trip Secrets",
-        desc: "Leaked audio from the college trip bus.",
-        src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3", // Placeholder
-        image: "https://placehold.co/400x400/151525/FFF?text=Audio+3",
-        duration: "15:00"
-    },
-    {
-        id: "4",
-        title: "Neighbor's Request",
-        desc: "She knocked on the door at 2 AM...",
-        src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3", // Placeholder
-        image: "https://placehold.co/400x400/151525/FFF?text=Audio+4",
-        duration: "10:30"
     }
 ];
 
