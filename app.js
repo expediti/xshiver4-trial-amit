@@ -5,7 +5,7 @@ const SOURCES = {
     "Telegram Viral": "data/lol49.json"
 };
 
-const PER_PAGE = 16;
+const PER_PAGE = 20;
 
 // --- STATE ---
 let cache = {};
@@ -16,11 +16,12 @@ let currentPage = 1;
 // ---------- FETCHING LOGIC ----------
 async function loadDataForCategory(category) {
     const grid = document.getElementById("videoGrid");
-    grid.innerHTML = `<div style="text-align:center; padding:20px; color:white;">Loading videos...</div>`;
+    if (grid) grid.innerHTML = `<div style="text-align:center; padding:20px; color:white;">Loading videos...</div>`;
 
     try {
         let videosToShow = [];
 
+        // CASE 1: "All" - Fetch EVERYTHING from all 3 files
         if (category === "All") {
             const promises = Object.values(SOURCES).map(async (url) => {
                 try {
@@ -34,8 +35,10 @@ async function loadDataForCategory(category) {
             });
 
             const results = await Promise.all(promises);
+            // Merge all files into one big list
             videosToShow = results.flat();
         
+        // CASE 2: Specific Category - Fetch ONE file
         } else {
             const url = SOURCES[category];
             if (!cache[url]) {
@@ -46,10 +49,12 @@ async function loadDataForCategory(category) {
             videosToShow = cache[url];
         }
 
+        // --- SHUFFLE LOGIC ---
         videosToShow = videosToShow.sort(() => Math.random() - 0.5);
 
+        // CHECK IF EMPTY
         if (!videosToShow || videosToShow.length === 0) {
-            grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ff4444;">No videos found.</div>`;
+            if (grid) grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ff4444;">No videos found.</div>`;
             return;
         }
 
@@ -59,7 +64,7 @@ async function loadDataForCategory(category) {
 
     } catch (e) {
         console.error(e);
-        grid.innerHTML = `<div style="text-align:center; padding:20px; color:red;">Error loading videos.</div>`;
+        if (grid) grid.innerHTML = `<div style="text-align:center; padding:20px; color:red;">Error loading videos.</div>`;
     }
 }
 
@@ -75,6 +80,7 @@ function updateCategoryUI(selectedName) {
     });
 }
 
+// ---------- RENDER GRID ----------
 function renderGrid(customList = null) {
     const grid = document.getElementById("videoGrid");
     const pageInfo = document.getElementById("pageInfo");
@@ -85,6 +91,7 @@ function renderGrid(customList = null) {
 
     let list = customList || currentVideos;
 
+    // Pagination
     const totalPages = Math.ceil(list.length / PER_PAGE) || 1;
     if (currentPage > totalPages) currentPage = 1;
     if (currentPage < 1) currentPage = 1;
@@ -99,10 +106,15 @@ function renderGrid(customList = null) {
         const randomViews = Math.floor(Math.random() * 900 + 100) + 'k';
         const d = document.createElement("div");
         d.className = "card";
+        d.onclick = () => window.location.href = `watch.html?id=${v.id}`;
+        
+        let thumb = v.thumbnailUrl;
+        if(thumb.includes('data:image')) thumb = "https://placehold.co/600x400/151525/FFF?text=Video";
+
         d.innerHTML = `
             <div class="card-thumb-container">
                 <img 
-                    src="${v.thumbnailUrl}" 
+                    src="${thumb}" 
                     class="card-thumb" 
                     loading="lazy"
                     onerror="this.onerror=null; this.src='https://placehold.co/600x400/151525/FFF?text=No+Preview';"
@@ -116,10 +128,10 @@ function renderGrid(customList = null) {
                 </div>
             </div>
         `;
-        d.onclick = () => window.location.href = `watch.html?id=${v.id}`;
         grid.appendChild(d);
     });
 
+    // Update Controls
     if (pageInfo) pageInfo.innerText = `${currentPage} / ${totalPages}`;
     
     if (prev) {
@@ -132,11 +144,13 @@ function renderGrid(customList = null) {
     }
 }
 
+// ---------- INIT HEADER ----------
 function initHeader() {
     const nav = document.getElementById("categoryTabs");
     if (!nav) return;
     nav.innerHTML = "";
 
+    // "All" Button
     const allBtn = document.createElement("button");
     allBtn.className = "cat-btn active";
     allBtn.innerText = "All";
@@ -147,6 +161,7 @@ function initHeader() {
     };
     nav.appendChild(allBtn);
 
+    // Other Buttons
     Object.keys(SOURCES).forEach(name => {
         const b = document.createElement("button");
         b.className = "cat-btn";
@@ -160,6 +175,7 @@ function initHeader() {
     });
 }
 
+// ---------- SEARCH ----------
 function initSearch() {
     const s = document.getElementById("searchInput");
     if (!s) return;
@@ -176,42 +192,9 @@ function initSearch() {
     };
 }
 
-// ---------- VERIFICATION LOGIC (FIXED) ----------
-
-function verifyUser() {
-    const user = document.getElementById("entryUser").value.trim();
-    // FIX: Look for "entryAge" instead of Email
-    const ageInput = document.getElementById("entryAge");
-    const error = document.getElementById("entryError");
-
-    const age = ageInput ? ageInput.value.trim() : "";
-
-    // Validation: Check Username and Age >= 18
-    if (user.length < 1 || !age || parseInt(age) < 18) {
-        error.style.display = "block";
-        error.innerText = "You must verify your age (18+) to enter.";
-        return;
-    }
-
-    // Save & Unlock
-    localStorage.setItem("xshiver_user", JSON.stringify({ user, age }));
-    document.getElementById("entryPopup").style.display = "none";
-    startSite();
-}
-
-function startSite() {
+// ---------- MAIN START ----------
+document.addEventListener("DOMContentLoaded", () => {
     initHeader();
     initSearch();
     loadDataForCategory("All");
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const savedUser = localStorage.getItem("xshiver_user");
-
-    if (savedUser) {
-        startSite();
-    } else {
-        const popup = document.getElementById("entryPopup");
-        if(popup) popup.style.display = "flex";
-    }
 });
