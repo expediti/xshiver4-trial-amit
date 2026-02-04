@@ -14,7 +14,7 @@
     
     <title>XSHIVER - Watch Free HD Viral Videos</title>
     <meta name="description" content="Watch the latest viral videos, leaked content, and trending clips in HD on XSHIVER.">
-    <meta name="keywords" content="viral videos, leaked videos, desi viral, telegram viral, xshiver, hd video streaming">
+    <meta name="keywords" content="viral videos, indian viral mms, full porn hd, xxx, indian viral porn, indian viral mms, indian viral big boobs girl, indian big boobs mms, indian mms leaked, indian girl nude, nude girl, full mms, indian telegram viral, telegram leaked mms, instagram leaked viral mms, indian girl fingering, indian girl showing big boobs, girl chudai, girl indian xxx, indian xxx, indian bur chudai, indian gand chudai, indian girl nude boobs, indian girl showing boobs, indian girl mms, full hd viral mms, indian girl showing nude boobs, indian fucking xxx, indian viral mms, leaked videos, desi viral, telegram viral, trending clips, xshiver, hd video streaming">
     <meta name="robots" content="index, follow">
     <meta name="author" content="XSHIVER">
 
@@ -50,11 +50,11 @@
             <div class="header-actions">
                 <a href="audio.html" class="btn-audio">
                     AUDIO 🎧
-                    <span>Premium Stories</span>
+                    <span>Stories</span>
                 </a>
                 <a href="pro.html" class="btn-pro">
                     GET PRO
-                    <span>150+ Bundle</span>
+                    <span>Bundle</span>
                 </a>
                 <button id="themeToggle" class="theme-btn">🌙</button>
             </div>
@@ -123,16 +123,13 @@
     </div>
 
     <script>
-        // Theme Logic
+        // 1. Theme Logic
         const toggleBtn = document.getElementById('themeToggle');
         const body = document.body;
-        
-        // Load Saved Theme
         if (localStorage.getItem('theme') === 'light') {
             body.classList.add('light-mode');
             toggleBtn.innerText = '☀️';
         }
-
         toggleBtn.addEventListener('click', () => {
             body.classList.toggle('light-mode');
             const isLight = body.classList.contains('light-mode');
@@ -140,196 +137,37 @@
             toggleBtn.innerText = isLight ? '☀️' : '🌙';
         });
 
-        // 18+ Logic
+        // 2. 18+ Verification Logic (FIXED)
         document.addEventListener("DOMContentLoaded", () => {
-            const isVerified = localStorage.getItem("xshiver_age_verified");
-            const popup = document.getElementById("agePopup");
-            
-            if (isVerified === "true") {
-                popup.style.display = "none"; 
-            } else {
-                popup.style.display = "flex"; 
+            try {
+                const isVerified = localStorage.getItem("xshiver_age_verified");
+                const popup = document.getElementById("agePopup");
+                
+                if (isVerified === "true") {
+                    popup.style.display = "none";
+                } else {
+                    popup.style.display = "flex";
+                }
+            } catch(e) {
+                // If localstorage is blocked, show popup every time
+                document.getElementById("agePopup").style.display = "flex";
             }
         });
 
         function enterSite() {
-            localStorage.setItem("xshiver_age_verified", "true");
-            document.getElementById("agePopup").style.display = "none";
-        }
-
-        function leaveSite() {
-            window.location.href = "https://www.google.com";
-        }
-    </script>
-
-    <script src="app.js"></script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-K5PXH0YEB7"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-K5PXH0YEB7');
-    </script>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <title>XSHIVER - Watch Free HD Viral Videos</title>
-    <meta name="description" content="Watch the latest viral videos, leaked content, and trending clips in HD on XSHIVER. Daily updates, fast streaming, and premium content for free.">
-    <meta name="keywords" content="viral videos, indian viral mms, latest viral porn, latest instagram porn mms, latest leaked nude mms, latest nude viral porn, full porn hd, xxx, indian viral porn, indian viral mms, indian viral big boobs girl, indian big boobs mms, indian mms leaked, indian girl nude, nude girl, full mms, indian telegram viral, telegram leaked mms, instagram leaked viral mms, indian girl fingering, indian girl showing big boobs, girl chudai, girl indian xxx, indian xxx, indian bur chudai, indian gand chudai, indian girl nude boobs, indian girl showing boobs, indian girl mms, full hd viral mms, indian girl showing nude boobs, indian fucking xxx, indian viral mms, leaked videos, desi viral, telegram viral, trending clips, xshiver, hd mms, hd porn, hd nude, mia khalifa, sunny leone full, instagram link porn, telegram free link porn, free link nude, mms">
-    <meta name="robots" content="index, follow">
-    <meta name="author" content="XSHIVER">
-
-    <meta property="og:title" content="XSHIVER - Viral & Premium Videos">
-    <meta property="og:description" content="Watch trending viral videos for free on XSHIVER.">
-    <meta property="og:image" content="https://xshiver.online/logo.svg">
-    <meta property="og:url" content="https://xshiver.online">
-    <meta property="og:type" content="website">
-
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="style.css">
-
-    <style>
-        .popup-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95); z-index: 9999;
-            backdrop-filter: blur(10px);
-            display: flex; justify-content: center; align-items: center;
-            padding: 20px;
-        }
-        .popup-content {
-            background: #1a1a24; border: 2px solid #00b4ff;
-            border-radius: 16px; padding: 30px 20px; width: 100%; max-width: 400px;
-            text-align: center; box-shadow: 0 0 30px rgba(0, 180, 255, 0.2);
-        }
-        .popup-btn-group {
-            display: flex; gap: 15px; justify-content: center; margin-top: 20px;
-        }
-        .btn-yes {
-            background: #00b4ff; color: white; border: none;
-            padding: 12px 24px; border-radius: 8px; font-weight: bold;
-            cursor: pointer; flex: 1; text-transform: uppercase;
-        }
-        .btn-no {
-            background: #333; color: #aaa; border: 1px solid #555;
-            padding: 12px 24px; border-radius: 8px; font-weight: bold;
-            cursor: pointer; flex: 1; text-transform: uppercase;
-        }
-        .btn-yes:hover { box-shadow: 0 0 15px rgba(0, 180, 255, 0.4); }
-        .btn-no:hover { background: #444; color: white; }
-    </style>
-</head>
-<body>
-
-    <script async type="application/javascript" src="https://a.pemsrv.com/ad-provider.js"></script> 
-    <ins class="eas6a97888e33" data-zoneid="5843706" data-keywords="keywords" data-sub="123450000"  data-ex_av="name"></ins> 
-    <script>(AdProvider = window.AdProvider || []).push({"serve": {}});</script>
-
-    <script async type="application/javascript" src="https://a.magsrv.com/ad-provider.js"></script> 
-    <ins class="eas6a97888e6" data-zoneid="5843710"></ins> 
-    <script>(AdProvider = window.AdProvider || []).push({"serve": {}});</script>
-
-    <script async type="application/javascript" src="https://a.pemsrv.com/ad-provider.js"></script> 
-    <ins class="eas6a97888e35" data-zoneid="5843672"></ins> 
-    <script>(AdProvider = window.AdProvider || []).push({"serve": {}});</script>
-
-    <header>
-        <div class="header-top">
-            <a href="index.html" class="logo">
-                <img src="logo.svg" alt="XSHIVER" onerror="this.src='https://placehold.co/150x50/0a0a1a/00b4ff?text=XSHIVER'">
-            </a>
-            <a href="pro.html" class="btn-pro">
-                GET PRO FREE
-                <span>150+ Videos Bundle</span>
-            </a>
-        </div>
-
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="Search videos...">
-        </div>
-
-        <nav class="category-scroll" id="categoryTabs">
-        </nav>
-    </header>
-
-    <main>
-        <a href="https://xshiver.online" target="_blank" class="premium-box">
-            <span class="pulse-icon">💎</span>
-            Checkout our new <span class="highlight">PREMIUM SITE</span> with 4K Quality Material
-            <div class="sub-text">Tap here to visit Xshiver.online</div>
-        </a>
-
-        <div class="video-grid" id="videoGrid">
-        </div>
-
-        <div class="pagination">
-            <button id="prev">Prev</button>
-            <span id="pageInfo">1 / 1</span>
-            <button id="next">Next</button>
-        </div>
-
-        <div class="ad-section">
-            <div class="ad-title">Special Gift</div>
-            <a href="pro.html" class="single-free-card">
-                <div class="free-card-content">
-                    <span class="gift-icon">🎁</span>
-                    <div class="text-group">
-                        <div class="free-title">GET PREMIUM VIDEO FREE</div>
-                        <div class="free-sub">Tap here to claim your reward instantly</div>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </main>
-
-    <footer>
-        <div class="social-links">
-            <a href="#">Instagram</a>
-            <a href="#">Telegram</a>
-        </div>
-        <p style="margin-top:10px; opacity:0.5;">&copy; 2026 XSHIVER</p>
-    </footer>
-
-    <div id="agePopup" class="popup-overlay" style="display: flex;"> <div class="popup-content">
-            <div style="font-size: 40px; margin-bottom: 10px;">🔞</div>
-            <h2 style="color:white; margin-bottom:10px;">AGE RESTRICTED</h2>
-            <p style="color:#aaa; font-size:0.9rem; line-height:1.4;">
-                This website contains material restricted to adults. 
-                <br><strong>Are you 18 years of age or older?</strong>
-            </p>
-            
-            <div class="popup-btn-group">
-                <button class="btn-no" onclick="leaveSite()">NO</button>
-                <button class="btn-yes" onclick="enterSite()">YES</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Check if user already Verified
-        document.addEventListener("DOMContentLoaded", () => {
-            const isVerified = localStorage.getItem("xshiver_age_verified");
+            // STEP 1: Hide Popup IMMEDIATELY (Prioritize UX)
             const popup = document.getElementById("agePopup");
-            
-            if (isVerified === "true") {
-                popup.style.display = "none"; // Hide if verified
-            } else {
-                popup.style.display = "flex"; // Show if new
-            }
-        });
+            if(popup) popup.style.display = "none";
 
-        function enterSite() {
-            // Save verification and close popup
-            localStorage.setItem("xshiver_age_verified", "true");
-            document.getElementById("agePopup").style.display = "none";
+            // STEP 2: Try to save (If it fails, user still enters)
+            try {
+                localStorage.setItem("xshiver_age_verified", "true");
+            } catch (e) {
+                console.log("Storage blocked, but user entered.");
+            }
         }
 
         function leaveSite() {
-            // Redirect away
             window.location.href = "https://www.google.com";
         }
     </script>
