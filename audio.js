@@ -3,8 +3,8 @@
 const audioStories = [
     {
         id: "1",
-        title: "Forbidden Night - Part 1",
-        desc: "A true story about a midnight encounter.",
+        title: "Class 11 hot Sex story - Part 1",
+        desc: "sexy gf bf and another girl",
         // path: foldername/filename
         src: "audio1/audio1.mp3", 
         image: "audio1/audio1.jpg", 
