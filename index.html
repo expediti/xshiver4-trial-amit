@@ -78,11 +78,6 @@
             <div class="sub-text">Tap here to visit Xshiver.online</div>
         </a>
 
-        <div style="margin: 20px 0;">
-            <script async="async" data-cfasync="false" src="//pl26659890.effectivegatecpm.com/2520073f631a11d8cfdcda497178c1b8/invoke.js"></script>
-            <div id="container-2520073f631a11d8cfdcda497178c1b8"></div>
-        </div>
-
         <div class="video-grid" id="videoGrid">
         </div>
 
@@ -160,7 +155,7 @@
             toggleBtn.innerText = isLight ? '☀️' : '🌙';
         });
 
-        // 2. 18+ Verification
+        // 2. 18+ Verification (CLEAN ENTRY - NO AD)
         document.addEventListener("DOMContentLoaded", () => {
             try {
                 const isVerified = localStorage.getItem("xshiver_age_verified");
@@ -186,12 +181,12 @@
         }
 
         // 3. 🔥 SMARTLINK INTERCEPTOR 🔥
+        // Triggers ONLY on Video Cards & Premium Buttons (One-Click Intercept)
         const smartLinkUrl = "https://www.effectivegatecpm.com/av3badn4?key=c1f018cbffd17263e26824b8463a33e2";
         let isAdShown = false;
 
         document.addEventListener('click', function(event) {
-            // Target: Cards, Video Grid, Pro/Audio Buttons, Yes Button
-            const target = event.target.closest('.card, .video-grid, .btn-pro, .btn-audio, .btn-yes');
+            const target = event.target.closest('.card, .btn-pro, .btn-audio');
             
             if (target && !isAdShown) {
                 event.preventDefault();
