@@ -1,213 +1,150 @@
-// --- CONFIGURATION ---
-const SOURCES = {
-    "Instagram Viral": "data/fuckmaza.json",
-    "Indian Leaked": "data/bhojpuri.json",
-    "Telegram Viral": "data/lol49.json"
-};
+// LIST OF YOUR DATA FILES (Inside data folder)
+const DATA_FILES = [
+    "data/fuckmaza.json",
+    "data/bhojpuri.json",
+    "data/lol49.json"
+];
 
-const PER_PAGE = 20;
+// Get ID from URL
+const params = new URLSearchParams(window.location.search);
+const currentId = params.get("id");
 
-// --- STATE ---
-let cache = {};
-let currentCategory = "All"; 
-let currentVideos = [];
-let currentPage = 1;
+async function initWatch() {
+    if (!currentId) { window.location.href = "index.html"; return; }
 
-// ---------- FETCHING LOGIC (OPTIMIZED) ----------
-async function loadDataForCategory(category) {
-    const grid = document.getElementById("videoGrid");
-    if (grid) grid.innerHTML = `<div style="text-align:center; padding:20px; color:white;">Loading videos...</div>`;
+    // SEO Canonical
+    let link = document.querySelector("link[rel='canonical']");
+    if (!link) {
+        link = document.createElement("link");
+        link.rel = "canonical";
+        document.head.appendChild(link);
+    }
+    link.href = window.location.origin + "/watch.html?id=" + currentId;
 
     try {
-        let videosToShow = [];
+        let foundVideo = null;
+        let allVideos = [];
 
-        // 1. CHECK BROWSER STORAGE FIRST (SPEED BOOST)
+        // 1. TRY LOADING FROM CACHE FIRST (Super Fast)
         const cachedData = sessionStorage.getItem('xshiver_data_all');
+        if (cachedData) {
+            allVideos = JSON.parse(cachedData);
+            foundVideo = allVideos.find(v => v.id === currentId);
+        }
 
-        if (category === "All" && cachedData) {
-            // Load instantly from memory if available
-            videosToShow = JSON.parse(cachedData);
-        } 
-        else {
-            // 2. IF NO CACHE, DOWNLOAD FILES
-            if (category === "All") {
-                const promises = Object.values(SOURCES).map(async (url) => {
-                    try {
-                        const res = await fetch(url);
-                        if (!res.ok) return []; 
-                        return await res.json();
-                    } catch (err) {
-                        console.error(`Skipping ${url}:`, err);
-                        return [];
-                    }
-                });
-
-                const results = await Promise.all(promises);
-                videosToShow = results.flat();
-
-                // Save to storage for next time (Instant Load)
+        // 2. IF NOT IN CACHE, FETCH FILES (Fallback)
+        if (!foundVideo) {
+            for (const url of DATA_FILES) {
                 try {
-                    sessionStorage.setItem('xshiver_data_all', JSON.stringify(videosToShow));
-                } catch (e) { console.warn("Cache full"); }
-            
-            } else {
-                // Specific Category Handling
-                const url = SOURCES[category];
-                if (!cache[url]) {
                     const res = await fetch(url);
-                    if (!res.ok) throw new Error(`File not found: ${url}`);
-                    cache[url] = await res.json();
+                    const data = await res.json();
+                    
+                    // Add to main list for suggestions later
+                    allVideos = allVideos.concat(data);
+
+                    // Check if this file has our video
+                    const match = data.find(v => v.id === currentId);
+                    if (match) {
+                        foundVideo = match;
+                    }
+                } catch (err) {
+                    console.warn(`Could not load ${url}`, err);
                 }
-                videosToShow = cache[url];
             }
         }
 
-        // --- SHUFFLE LOGIC ---
-        videosToShow = videosToShow.sort(() => Math.random() - 0.5);
+        // 3. If video found, render it
+        if (foundVideo) {
+            // UI & SEO
+            document.title = foundVideo.title + " - XSHIVER";
+            document.getElementById("title").innerText = foundVideo.title;
+            document.getElementById("description").innerText = foundVideo.description || `Watch ${foundVideo.title} on XSHIVER.`;
 
-        // CHECK IF EMPTY
-        if (!videosToShow || videosToShow.length === 0) {
-            if (grid) grid.innerHTML = `<div style="text-align:center; padding:40px; color:#ff4444;">No videos found.</div>`;
-            return;
+            // Tags
+            const tagBox = document.getElementById("tags");
+            tagBox.innerHTML = "";
+            if (foundVideo.tags) {
+                foundVideo.tags.forEach(t => {
+                    const s = document.createElement("span");
+                    s.className = "tag-pill";
+                    s.innerText = `#${t}`;
+                    tagBox.appendChild(s);
+                });
+            }
+
+            // --- FLUID PLAYER SETUP (FIXED) ---
+            const playerVideoTag = document.getElementById("mainPlayer");
+            
+            // Set Source
+            playerVideoTag.innerHTML = `<source src="${foundVideo.embedUrl}" type="video/mp4" />`;
+            
+            // Initialize Player
+            // NOTICE: Logo section removed as per previous settings
+            fluidPlayer("mainPlayer", {
+                layoutControls: {
+                    fillToContainer: true,
+                    posterImage: foundVideo.thumbnailUrl || '', 
+                    autoPlay: false, 
+                    playButtonShowing: true,
+                    playPauseAnimation: true
+                },
+                vastOptions: {
+                    adList: [
+                        {
+                            roll: 'preRoll', 
+                            vastTag: 'https://s.magsrv.com/v1/vast.php?idzone=5843716' // YOUR AD TAG
+                        }
+                    ]
+                }
+            });
+
+            // 4. Render Suggestions
+            renderRelated(foundVideo, allVideos);
+
+        } else {
+            document.getElementById("title").innerText = "Video not found in any database.";
         }
 
-        currentVideos = videosToShow;
-        currentPage = 1;
-        renderGrid();
-
     } catch (e) {
-        console.error(e);
-        if (grid) grid.innerHTML = `<div style="text-align:center; padding:20px; color:red;">Error loading videos.</div>`;
+        console.error("Error loading videos:", e);
+        document.getElementById("title").innerText = "Error loading content.";
     }
 }
 
-// ---------- UI HELPERS ----------
-function updateCategoryUI(selectedName) {
-    const buttons = document.querySelectorAll('.cat-btn');
-    buttons.forEach(b => {
-        if (b.innerText === selectedName) {
-            b.classList.add('active');
-        } else {
-            b.classList.remove('active');
-        }
-    });
-}
-
-// ---------- RENDER GRID ----------
-function renderGrid(customList = null) {
-    const grid = document.getElementById("videoGrid");
-    const pageInfo = document.getElementById("pageInfo");
-    const prev = document.getElementById("prev");
-    const next = document.getElementById("next");
-
+function renderRelated(current, all) {
+    const grid = document.getElementById("related");
     if (!grid) return;
-
-    let list = customList || currentVideos;
-
-    // Pagination
-    const totalPages = Math.ceil(list.length / PER_PAGE) || 1;
-    if (currentPage > totalPages) currentPage = 1;
-    if (currentPage < 1) currentPage = 1;
-
-    const start = (currentPage - 1) * PER_PAGE;
-    const end = start + PER_PAGE;
-    const pageVideos = list.slice(start, end);
-
     grid.innerHTML = "";
 
-    pageVideos.forEach(v => {
-        const randomViews = Math.floor(Math.random() * 900 + 100) + 'k';
-        const d = document.createElement("div");
-        d.className = "card";
-        d.onclick = () => window.location.href = `watch.html?id=${v.id}`;
-        
-        let thumb = v.thumbnailUrl;
-        if(thumb.includes('data:image')) thumb = "https://placehold.co/600x400/151525/FFF?text=Video";
+    // Filter, Shuffle, and Slice
+    const list = all
+        .filter(v => v.id !== current.id)
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 10);
 
-        d.innerHTML = `
+    list.forEach(item => {
+        let thumb = item.thumbnailUrl;
+        if (thumb.includes("data:image"))
+            thumb = "https://placehold.co/600x400/1a1a24/FFF?text=No+Preview";
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.onclick = () => (window.location.href = `watch.html?id=${item.id}`);
+
+        card.innerHTML = `
             <div class="card-thumb-container">
-                <img 
-                    src="${thumb}" 
-                    class="card-thumb" 
-                    loading="lazy"
-                    onerror="this.onerror=null; this.src='https://placehold.co/600x400/151525/FFF?text=No+Preview';"
-                >
-                <span class="duration-badge">${v.duration || '00:00'}</span>
+                <img src="${thumb}" class="card-thumb" onerror="this.src='https://placehold.co/600x400/1a1a24/FFF?text=No+Image'">
+                <span class="duration-badge">${item.duration || "00:00"}</span>
             </div>
             <div class="card-info">
-                <div class="card-title">${v.title}</div>
+                <div class="card-title">${item.title}</div>
                 <div class="card-meta">
-                    <span>${randomViews} views</span>
+                    <span>${item.views || '1k'} views</span>
                 </div>
             </div>
         `;
-        grid.appendChild(d);
-    });
-
-    // Update Controls
-    if (pageInfo) pageInfo.innerText = `${currentPage} / ${totalPages}`;
-    
-    if (prev) {
-        prev.disabled = currentPage === 1;
-        prev.onclick = () => { currentPage--; renderGrid(customList); window.scrollTo(0,0); };
-    }
-    if (next) {
-        next.disabled = currentPage === totalPages;
-        next.onclick = () => { currentPage++; renderGrid(customList); window.scrollTo(0,0); };
-    }
-}
-
-// ---------- INIT HEADER ----------
-function initHeader() {
-    const nav = document.getElementById("categoryTabs");
-    if (!nav) return;
-    nav.innerHTML = "";
-
-    // "All" Button
-    const allBtn = document.createElement("button");
-    allBtn.className = "cat-btn active";
-    allBtn.innerText = "All";
-    allBtn.onclick = () => {
-        currentCategory = "All";
-        updateCategoryUI("All");
-        loadDataForCategory("All");
-    };
-    nav.appendChild(allBtn);
-
-    // Other Buttons
-    Object.keys(SOURCES).forEach(name => {
-        const b = document.createElement("button");
-        b.className = "cat-btn";
-        b.innerText = name;
-        b.onclick = () => {
-            currentCategory = name;
-            updateCategoryUI(name);
-            loadDataForCategory(name);
-        };
-        nav.appendChild(b);
+        grid.appendChild(card);
     });
 }
 
-// ---------- SEARCH ----------
-function initSearch() {
-    const s = document.getElementById("searchInput");
-    if (!s) return;
-
-    s.oninput = (e) => {
-        const q = e.target.value.toLowerCase();
-        if (!q) {
-            renderGrid();
-            return;
-        }
-        const results = currentVideos.filter(v => (v.title && v.title.toLowerCase().includes(q)));
-        currentPage = 1;
-        renderGrid(results);
-    };
-}
-
-// ---------- MAIN START ----------
-document.addEventListener("DOMContentLoaded", () => {
-    initHeader();
-    initSearch();
-    loadDataForCategory("All");
-});
+document.addEventListener("DOMContentLoaded", initWatch);
