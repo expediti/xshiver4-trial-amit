@@ -10,7 +10,6 @@ const params = new URLSearchParams(window.location.search);
 const currentId = params.get("id");
 
 async function initWatch() {
-    // FIX: Removed redirect to prevent reload loop
     if (!currentId) { 
         document.getElementById("title").innerText = "No video ID provided.";
         return; 
@@ -30,7 +29,6 @@ async function initWatch() {
         let allVideos = [];
 
         // 1. TRY LOADING FROM CACHE FIRST (Super Fast)
-        // This matches the cache key used in app.js
         const cachedData = sessionStorage.getItem('xshiver_cache_all');
         if (cachedData) {
             allVideos = JSON.parse(cachedData);
