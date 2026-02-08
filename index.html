@@ -33,14 +33,14 @@
         /* INTRO ANIMATION OVERLAY */
         #introOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #0a0a1a; /* Matches site theme */
-            z-index: 200000; /* Above everything */
-            display: none; /* Hidden by default */
+            background-color: #0a0a1a; 
+            z-index: 200000; 
+            display: none; 
             align-items: center; justify-content: center;
             flex-direction: column;
         }
         #introVideo {
-            width: 300px; /* Adjust size of your logo */
+            width: 300px;
             height: auto;
             max-width: 80%;
         }
@@ -164,7 +164,7 @@
     <script type='text/javascript' src='//pl26644817.effectivegatecpm.com/e7/8a/82/e78a8229a575e82eafe9d2dab6b17600.js'></script>
 
     <script>
-        // 1. Theme Logic
+        // 1. Theme
         const toggleBtn = document.getElementById('themeToggle');
         const body = document.body;
         if (localStorage.getItem('theme') === 'light') {
@@ -178,7 +178,7 @@
             toggleBtn.innerText = isLight ? '☀️' : '🌙';
         });
 
-        // 2. 18+ Verification & Animation Logic
+        // 2. 18+ & Animation Logic
         document.addEventListener("DOMContentLoaded", () => {
             try {
                 const isVerified = localStorage.getItem("xshiver_age_verified");
@@ -194,25 +194,20 @@
         });
 
         function enterSite() {
-            // A. Hide Warning Popup
             const popup = document.getElementById("agePopup");
             if(popup) popup.style.display = "none";
 
-            // B. Show Animation Overlay
             const overlay = document.getElementById("introOverlay");
             if(overlay) {
                 overlay.style.display = "flex";
                 const vid = document.getElementById("introVideo");
                 if(vid) vid.play().catch(e => console.log("Autoplay blocked"));
 
-                // C. Wait 2.5 Seconds
                 setTimeout(() => {
                     overlay.style.display = "none";
-                    // D. Save Verification State
                     try { localStorage.setItem("xshiver_age_verified", "true"); } catch (e) {}
                 }, 2500); 
             } else {
-                // Fallback if overlay fails
                 try { localStorage.setItem("xshiver_age_verified", "true"); } catch (e) {}
             }
         }
@@ -220,32 +215,8 @@
         function leaveSite() {
             window.location.href = "https://www.google.com";
         }
-
-        // 3. 🔥 MINIMAL SMARTLINK (DELAYED) 🔥
-        const smartLinkUrl = "https://www.effectivegatecpm.com/av3badn4?key=c1f018cbffd17263e26824b8463a33e2";
-        let isAdShown = false;
-        let isAdActive = false; // Ad starts OFF
-
-        // Activate ad only after 4 seconds
-        setTimeout(() => {
-            isAdActive = true;
-        }, 4000);
-
-        document.addEventListener('click', function(event) {
-            // Trigger ONLY on Video Cards & Buttons (Not Yes button)
-            const target = event.target.closest('.card, .btn-pro, .btn-audio');
-            
-            // Logic: Ad must be Active (Time passed) AND Not Shown Yet
-            if (target && isAdActive && !isAdShown) {
-                event.preventDefault();
-                event.stopPropagation();
-                
-                // Mark shown so it never happens again
-                isAdShown = true; 
-                
-                window.open(smartLinkUrl, '_blank');
-            }
-        }, true);
+        
+        // REDIRECT ADS COMPLETELY REMOVED FROM HOMEPAGE
     </script>
 
     <script src="app.js"></script>
