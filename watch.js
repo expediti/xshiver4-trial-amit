@@ -86,14 +86,19 @@ async function initWatch() {
                     playButtonShowing: true,
                     playPauseAnimation: true
                 },
-                vastOptions: {
-                    adList: [
-                        {
-                            roll: 'preRoll', 
-                            vastTag: 'https://s.magsrv.com/v1/vast.php?idzone=5843716' // YOUR AD TAG
-                        }
-                    ]
-                }
+
+                
+                // vastOptions: {
+                //     adList: [
+                //         {
+                //             roll: 'preRoll', 
+                //             vastTag: 'https://s.magsrv.com/v1/vast.php?idzone=5843716' // YOUR AD TAG
+                //         }
+                //     ]
+                // }
+
+
+                
             });
 
             // 4. Render Suggestions
